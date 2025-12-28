@@ -26,6 +26,10 @@ export class Game {
   private direction = new THREE.Vector3();
   private playerBody: CANNON.Body;
   private cameraMode: 'first-person' | 'orbit' = 'orbit'; // Start with orbit
+  private sun: THREE.Mesh;
+  private sunGlow: THREE.Mesh;
+  private directionalLight: THREE.DirectionalLight;
+  private sunRotationSpeed: number = 0.05; // Speed of sun rotation
 
   constructor(socket: Socket) {
     this.socket = socket;
@@ -109,6 +113,40 @@ export class Game {
     };
     cameraFolder.add(cameraSettings, 'mode').listen().disable();
 
+    // Sun controls
+    const sunFolder = this.gui.addFolder("Sun & Day/Night Cycle");
+    const sunSettings = {
+      rotationSpeed: this.sunRotationSpeed,
+      pauseSun: false,
+      resetToNoon: () => {
+        // Reset sun to noon position (top of sky)
+        this.sun.position.set(0, 300, 0);
+        this.sunGlow.position.copy(this.sun.position);
+      }
+    };
+    
+    sunFolder
+      .add(sunSettings, 'rotationSpeed', 0, 1, 0.01)
+      .name('Sun Speed')
+      .onChange((value: number) => {
+        this.sunRotationSpeed = value;
+      });
+    
+    sunFolder
+      .add(sunSettings, 'pauseSun')
+      .name('Pause Sun')
+      .onChange((value: boolean) => {
+        if (value) {
+          this.sunRotationSpeed = 0;
+          sunSettings.rotationSpeed = 0;
+        } else {
+          this.sunRotationSpeed = 0.05;
+          sunSettings.rotationSpeed = 0.05;
+        }
+      });
+    
+    sunFolder.add(sunSettings, 'resetToNoon').name('Reset to Noon');
+
     // Background color
     const bgFolder = this.gui.addFolder("Background");
     const bgSettings = {
@@ -185,20 +223,48 @@ export class Game {
     this.scene.add(ambientLight);
 
     // Directional light (sun filtering through canopy)
-    const directionalLight = new THREE.DirectionalLight(0xffffcc, 0.8);
-    directionalLight.position.set(30, 50, 20);
-    directionalLight.castShadow = true;
-    directionalLight.shadow.camera.left = -60;
-    directionalLight.shadow.camera.right = 60;
-    directionalLight.shadow.camera.top = 60;
-    directionalLight.shadow.camera.bottom = -60;
-    directionalLight.shadow.mapSize.width = 2048;
-    directionalLight.shadow.mapSize.height = 2048;
-    this.scene.add(directionalLight);
+    this.directionalLight = new THREE.DirectionalLight(0xffffcc, 0.8);
+    this.directionalLight.position.set(30, 50, 20);
+    this.directionalLight.castShadow = true;
+    this.directionalLight.shadow.camera.left = -100;
+    this.directionalLight.shadow.camera.right = 100;
+    this.directionalLight.shadow.camera.top = 100;
+    this.directionalLight.shadow.camera.bottom = -100;
+    this.directionalLight.shadow.mapSize.width = 2048;
+    this.directionalLight.shadow.mapSize.height = 2048;
+    this.scene.add(this.directionalLight);
+
+    // Visual sun in the sky
+    const sunGeometry = new THREE.SphereGeometry(8, 32, 32);
+    const sunMaterial = new THREE.MeshBasicMaterial({
+      color: 0xffff99,
+      emissive: 0xffff66,
+      emissiveIntensity: 1.5
+    });
+    this.sun = new THREE.Mesh(sunGeometry, sunMaterial);
+    // Position sun far away in the direction of the light
+    const sunDistance = 300;
+    const lightDir = this.directionalLight.position.clone().normalize();
+    this.sun.position.copy(lightDir.multiplyScalar(sunDistance));
+    this.scene.add(this.sun);
+
+    // Sun glow effect
+    const glowGeometry = new THREE.SphereGeometry(12, 32, 32);
+    const glowMaterial = new THREE.MeshBasicMaterial({
+      color: 0xffff88,
+      transparent: true,
+      opacity: 0.3
+    });
+    this.sunGlow = new THREE.Mesh(glowGeometry, glowMaterial);
+    this.sunGlow.position.copy(this.sun.position);
+    this.scene.add(this.sunGlow);
 
     // Hemisphere light for natural outdoor lighting
     const hemisphereLight = new THREE.HemisphereLight(0x87a96b, 0x3a5a1a, 0.6);
     this.scene.add(hemisphereLight);
+
+    // Background color
+    this.scene.background = new THREE.Color(0x87a96b);
   }
 
   private setupSocketListeners(): void {
@@ -229,6 +295,32 @@ export class Game {
 
     // Update physics
     this.world.step(1 / 60, delta, 3);
+
+    // Rotate sun around the map
+    const sunOrbitRadius = 300;
+    const sunAngle = Date.now() * 0.0001 * this.sunRotationSpeed; // Slow rotation
+    
+    // Sun moves in arc from east to west
+    this.sun.position.x = Math.cos(sunAngle) * sunOrbitRadius;
+    this.sun.position.y = Math.sin(sunAngle) * sunOrbitRadius * 0.8 + 50; // Keep above horizon mostly
+    this.sun.position.z = Math.sin(sunAngle * 0.5) * sunOrbitRadius * 0.3;
+    
+    // Update glow position
+    this.sunGlow.position.copy(this.sun.position);
+    
+    // Update directional light to match sun position
+    const lightDirection = this.sun.position.clone().normalize();
+    this.directionalLight.position.copy(lightDirection.multiplyScalar(100));
+    
+    // Adjust light intensity based on sun height (day/night cycle)
+    const sunHeight = this.sun.position.y;
+    if (sunHeight > 0) {
+      // Daytime
+      this.directionalLight.intensity = 0.8 * (sunHeight / sunOrbitRadius);
+    } else {
+      // Nighttime - very dim
+      this.directionalLight.intensity = 0.1;
+    }
 
     if (this.cameraMode === 'first-person' && this.pointerControls.isLocked) {
       // First-person movement
