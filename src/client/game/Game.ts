@@ -26,9 +26,9 @@ export class Game {
   private direction = new THREE.Vector3();
   private playerBody: CANNON.Body;
   private cameraMode: 'first-person' | 'orbit' = 'orbit'; // Start with orbit
-  private sun: THREE.Mesh;
-  private sunGlow: THREE.Mesh;
-  private directionalLight: THREE.DirectionalLight;
+  private sun!: THREE.Mesh;
+  private sunGlow!: THREE.Mesh;
+  private directionalLight!: THREE.DirectionalLight;
   private sunRotationSpeed: number = 0.05; // Speed of sun rotation
 
   constructor(socket: Socket) {
@@ -237,9 +237,7 @@ export class Game {
     // Visual sun in the sky
     const sunGeometry = new THREE.SphereGeometry(8, 32, 32);
     const sunMaterial = new THREE.MeshBasicMaterial({
-      color: 0xffff99,
-      emissive: 0xffff66,
-      emissiveIntensity: 1.5
+      color: 0xffff99
     });
     this.sun = new THREE.Mesh(sunGeometry, sunMaterial);
     // Position sun far away in the direction of the light
