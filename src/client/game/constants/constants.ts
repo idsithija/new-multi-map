@@ -9,9 +9,9 @@ export const constants = {
     color: "#ff9c9c",
     intensity: 20,
     position: new Three.Vector3(10, 20, 10),
-    fogNear: 10,
-    fogFar: 200,
-    fogColor: "#0d0e23"
+    fogNear: 0,
+    fogFar: 20,
+    fogColor: "#d6c9a6"
   },
   floor: {
     color: "#b61b1b",

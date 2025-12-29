@@ -106,9 +106,9 @@ export class DebugControls {
     skyDebugFolder
       .addBinding(this.params.sky, "fogNear", {
         label: "Fog Near",
-        min: 0,
-        max: 1000,
-        step: 1,
+        min: -50,
+        max: 100,
+        step: 0.2,
       })
       .on("change", (ev) => {
         scene.fog = new Three.Fog(
@@ -121,9 +121,9 @@ export class DebugControls {
     skyDebugFolder
       .addBinding(this.params.sky, "fogFar", {
         label: "Fog Far",
-        min: 0,
+        min: -100,
         max: 200,
-        step: 1,
+        step: 0.2,
       })
       .on("change", (ev) => {
         scene.fog = new Three.Fog(
