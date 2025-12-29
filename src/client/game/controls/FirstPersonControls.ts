@@ -5,7 +5,6 @@ export class FirstPersonControls {
   private domElment: HTMLElement;
   private enabled: boolean = true;
   private defaultPosition = new THREE.Vector3(0, 2, 5);
-  private defaultRotation = new THREE.Euler(0, 0, 0);
 
   constructor(camera: THREE.PerspectiveCamera, domElement: HTMLElement) {
     // Initialize FirstPersonControls
@@ -23,6 +22,5 @@ export class FirstPersonControls {
 
   public resetCamera(camera: THREE.PerspectiveCamera): void {
     camera.position.copy(this.defaultPosition);
-    camera.rotation.copy(this.defaultRotation);
   }
 }
