@@ -20,7 +20,7 @@ export class FirstPersonControls {
     return this.enabled;
   }
 
-  public resetCamera(camera: THREE.PerspectiveCamera): void {
-    camera.position.copy(this.defaultPosition);
+  public resetCamera(): void {
+    this.camera.position.copy(this.defaultPosition);
   }
 }

@@ -2,6 +2,7 @@ import { OrbitControls as ThreeOrbitControls } from "three/examples/jsm/Addons.j
 import * as THREE from "three";
 
 export class OrbitControls {
+  private camera: THREE.PerspectiveCamera;
   private orbitControls: ThreeOrbitControls;
   private enabled: boolean = false;
   private defaultPosition = new THREE.Vector3(0, 10, 20);
@@ -10,6 +11,7 @@ export class OrbitControls {
   constructor(camera: THREE.PerspectiveCamera, domElement: HTMLElement) {
     // Initialize OrbitControls
     this.orbitControls = new ThreeOrbitControls(camera, domElement);
+    this.camera = camera;
 
     // Configure OrbitControls settings
     this.orbitControls.enableDamping = true;
@@ -34,8 +36,8 @@ export class OrbitControls {
     return this.enabled;
   }
 
-  public resetCamera(camera: THREE.PerspectiveCamera): void {
-    camera.position.copy(this.defaultPosition);
+  public resetCamera(): void {
+    this.camera.position.copy(this.defaultPosition);
     this.orbitControls.target.copy(this.defaultTarget);
     this.orbitControls.update();
   }

@@ -49,7 +49,6 @@ export class Game {
     // Debug Controls
     this.debugControlsPanel = new DebugControls(
       this.scene,
-      this.camera,
       this.orbitControls,
       this.firstPersonControls
     );
