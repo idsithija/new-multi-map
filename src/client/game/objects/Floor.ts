@@ -5,7 +5,7 @@ export class Floor {
   private floor: Three.Mesh;
   private size: number;
 
-  constructor(size: number = 200) {
+  constructor(size: number = 1000) {
     this.size = size;
 
     this.floor = this.createFloor();

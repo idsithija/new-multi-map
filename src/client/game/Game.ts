@@ -1,19 +1,19 @@
 import * as THREE from "three";
 import { Floor } from "./objects/Floor";
-import { FirstPersonControls } from "./controls/FirstPersonControls";
+import { ThirdPersonControls } from "./controls/ThirdPersonControls";
 import { DebugControls } from "./controls/DebugControls";
-import { OrbitControls } from "./controls/OrbitControls";
 import { Sky } from "./objects/Sky";
 import { constants } from "./constants/constants";
+import { Player } from "./objects/Player";
 
 export class Game {
   private scene: THREE.Scene;
   private camera: THREE.PerspectiveCamera;
   private renderer: THREE.WebGLRenderer;
-  private orbitControls: OrbitControls;
-  private firstPersonControls: FirstPersonControls;
+  private thirdPersonControls: ThirdPersonControls;
   private floor: Floor;
   private sky: Sky;
+  private player: Player;
 
   constructor() {
     // Scene setup
@@ -36,18 +36,6 @@ export class Game {
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     document.body.appendChild(this.renderer.domElement);
 
-    // First Person Controls
-    // this.firstPersonControls = new FirstPersonControls(
-    //   this.camera,
-    //   this.renderer.domElement
-    // );
-
-    // Orbit Controls
-    this.orbitControls = new OrbitControls(
-      this.camera,
-      this.renderer.domElement
-    );
-
     // Create Sky
     this.sky = new Sky(this.scene);
     this.sky.addSkyToScene(this.scene);
@@ -55,6 +43,17 @@ export class Game {
     // Create Floor
     this.floor = new Floor();
     this.floor.addFloorToScene(this.scene);
+
+    // Create Player
+    this.player = new Player();
+    this.player.addPlayerToScene(this.scene);
+
+    // Third Person Camera Controls (follows player)
+    this.thirdPersonControls = new ThirdPersonControls(
+      this.camera,
+      this.player.getPlayerMesh(),
+      new THREE.Vector3(0, 5, 10) // Camera offset: 10 units behind, 5 units above
+    );
 
     // Debug Controls
     new DebugControls(this.scene, this.sky, this.floor);
@@ -69,6 +68,12 @@ export class Game {
   // Animation loop
   private animate(): void {
     requestAnimationFrame(this.animate.bind(this));
+
+    // Update player movement
+    this.player.update();
+
+    // Update camera to follow player
+    this.thirdPersonControls.update();
 
     this.renderer.render(this.scene, this.camera);
   }
