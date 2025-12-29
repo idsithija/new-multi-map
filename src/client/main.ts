@@ -1,7 +1,10 @@
 import { io, Socket } from "socket.io-client";
 import { Game } from "./game/Game";
 
-let game: Game | null = null;
+// Initialize the game
+const game = new Game();
+console.log("Game initialized");
+
 let socket: Socket;
 
 // Connect to server
@@ -14,7 +17,3 @@ socket.on("connect", () => {
 socket.on("disconnect", () => {
   console.log("Disconnected from server");
 });
-
-// Start game immediately
-game = new Game(socket);
-game.start();
