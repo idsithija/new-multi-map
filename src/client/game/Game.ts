@@ -8,12 +8,10 @@ export class Game {
   private scene: THREE.Scene;
   private camera: THREE.PerspectiveCamera;
   private renderer: THREE.WebGLRenderer;
-  private clock: THREE.Clock;
   private orbitControls: OrbitControls;
   private firstPersonControls: FirstPersonControls;
   private floor: Floor;
   private debugControlsPanel: DebugControls;
-  private currentControlMode: "firstPerson" | "orbit" = "firstPerson";
 
   constructor() {
     // Scene setup
@@ -36,12 +34,6 @@ export class Game {
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     document.body.appendChild(this.renderer.domElement);
 
-    // Clock for delta time
-    this.clock = new THREE.Clock();
-
-    // Debug Controls
-    this.debugControlsPanel = new DebugControls(this.scene);
-
     // Orbit Controls
     this.orbitControls = new OrbitControls(
       this.camera,
@@ -54,66 +46,33 @@ export class Game {
       this.renderer.domElement
     );
 
+    // Debug Controls
+    this.debugControlsPanel = new DebugControls(
+      this.scene,
+      this.orbitControls,
+      this.firstPersonControls
+    );
+
     // Create Floor
     this.floor = new Floor();
     this.floor.addFloorToScene(this.scene);
 
+    // Handle window resize
     window.addEventListener("resize", this.onWindowResize.bind(this));
 
     // Start animation loop
     this.animate();
   }
 
-  private switchControlMode(mode: "firstPerson" | "orbit"): void {
-    console.log(`\n${"=".repeat(50)}`);
-    console.log(`🔄 Switching Camera Mode: ${mode.toUpperCase()}`);
-    console.log(`${"=".repeat(50)}\n`);
-
-    this.currentControlMode = mode;
-
-    if (mode === "firstPerson") {
-      // Disable orbit
-      this.orbitControls.setEnabled(false);
-
-      // Enable first person
-      this.firstPersonControls.setEnabled(true);
-
-      // Reset camera
-      this.camera.position.set(0, 1.7, 5);
-      this.camera.rotation.set(0, 0, 0);
-
-      console.log("✅ First Person Mode Active");
-      console.log("   • Click to lock mouse");
-      console.log("   • WASD to move");
-      console.log("   • Mouse to look around");
-      console.log("   • ESC to unlock mouse\n");
-    } else {
-      // Disable first person
-      this.firstPersonControls.setEnabled(false);
-
-      // Enable orbit
-      this.orbitControls.setEnabled(true);
-
-      // Position for orbit view
-      this.camera.position.set(10, 8, 10);
-      this.orbitControls.setTarget(0, 1, 0);
-      this.orbitControls.update();
-
-      console.log("✅ Orbit Mode Active");
-      console.log("   • Left drag to rotate");
-      console.log("   • Right drag to pan");
-      console.log("   • Scroll to zoom\n");
-    }
-  }
-
+  // Animation loop
   private animate(): void {
     requestAnimationFrame(this.animate.bind(this));
 
-    const delta = this.clock.getDelta();
+    console.log('Current Control Mode:', this.debugControlsPanel.getCurrentControlMode());
 
     // Update active controls
-    if (this.currentControlMode === "firstPerson") {
-      this.firstPersonControls.update(delta);
+    if (this.debugControlsPanel.getCurrentControlMode() === "firstPerson") {
+      this.firstPersonControls.update();
     } else {
       this.orbitControls.update();
     }
@@ -121,6 +80,7 @@ export class Game {
     this.renderer.render(this.scene, this.camera);
   }
 
+  // Handle window resize
   private onWindowResize(): void {
     this.camera.aspect = window.innerWidth / window.innerHeight;
     this.camera.updateProjectionMatrix();

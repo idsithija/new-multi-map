@@ -1,5 +1,7 @@
 import { Pane } from "tweakpane";
 import * as Three from "three";
+import { OrbitControls } from "./OrbitControls";
+import { FirstPersonControls } from "./FirstPersonControls";
 
 export class DebugControls {
   private pane: Pane;
@@ -7,19 +9,32 @@ export class DebugControls {
     cameraMode: "firstPerson" | "orbit";
     backgorundColor: string;
   };
-  private onCameraModeChange?: (mode: "firstPerson" | "orbit") => void;
+  private currentControlMode: "firstPerson" | "orbit" = "firstPerson";
+  private orbitControls: OrbitControls;
+  private firstPersonControls: FirstPersonControls;
 
-  constructor(scene: Three.Scene) {
+  constructor(
+    scene: Three.Scene,
+    orbitControls: OrbitControls,
+    firstPersonControls: FirstPersonControls
+  ) {
+    // Store references
+    this.orbitControls = orbitControls;
+    this.firstPersonControls = firstPersonControls;
+
+    // Initialize tweakpane
     this.pane = new Pane({
       title: "Debug Controls",
-      expanded: false,
+      expanded: true,
     });
 
+    // Parameters for tweakpane
     this.params = {
       cameraMode: "firstPerson",
       backgorundColor: "#000000",
     };
 
+    // General folder
     const generalDebugFolder = this.pane.addFolder({
       title: "General",
       expanded: false,
@@ -42,7 +57,29 @@ export class DebugControls {
         ],
       })
       .on("change", (ev) => {
-        this.onCameraModeChange?.(ev.value as "firstPerson" | "orbit");
+        this.switchControlMode(ev.value as "firstPerson" | "orbit");
       });
+  }
+
+  private switchControlMode(mode: "firstPerson" | "orbit"): void {
+    this.currentControlMode = mode;
+
+    if (mode === "firstPerson") {
+      // Disable orbit
+      this.orbitControls.setEnabled(false);
+
+      // Enable first person
+      this.firstPersonControls.setEnabled(true);
+    } else {
+      // Disable first person
+      this.firstPersonControls.setEnabled(false);
+
+      // Enable orbit
+      this.orbitControls.setEnabled(true);
+    }
+  }
+
+  public getCurrentControlMode(): "firstPerson" | "orbit" {
+    return this.currentControlMode;
   }
 }

@@ -11,7 +11,7 @@ export class FirstPersonControls {
     this.domElment = domElement;
   }
 
-  public update(delta: number): void {
+  public update(): void {
     if (!this.enabled) return;
   }
 
