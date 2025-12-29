@@ -1,27 +1,24 @@
 import { Pane } from "tweakpane";
 import * as Three from "three";
-import { OrbitControls } from "./OrbitControls";
-import { FirstPersonControls } from "./FirstPersonControls";
+import { Sky } from "../objects/Sky";
 
 export class DebugControls {
   private pane: Pane;
   private params: {
-    cameraMode: "firstPerson" | "orbit";
-    backgorundColor: string;
+    general: {
+      backgroundColor: string;
+    };
+    sky: {
+      color: string;
+      intensity: number;
+      position: Three.Vector3;
+      fogNear: number;
+      fogFar: number;
+      fogColor: string;
+    };
   };
-  private currentControlMode: "firstPerson" | "orbit" = "firstPerson";
-  private orbitControls: OrbitControls;
-  private firstPersonControls: FirstPersonControls;
 
-  constructor(
-    scene: Three.Scene,
-    orbitControls: OrbitControls,
-    firstPersonControls: FirstPersonControls
-  ) {
-    // Store references
-    this.orbitControls = orbitControls;
-    this.firstPersonControls = firstPersonControls;
-
+  constructor(scene: Three.Scene, sky: Sky) {
     // Initialize tweakpane
     this.pane = new Pane({
       title: "Debug Controls",
@@ -30,8 +27,17 @@ export class DebugControls {
 
     // Parameters for tweakpane
     this.params = {
-      cameraMode: "firstPerson",
-      backgorundColor: "#000000",
+      general: {
+        backgroundColor: "#000000",
+      },
+      sky: {
+        color: "#b3ccff",
+        intensity: 0.12,
+        position: new Three.Vector3(10, 20, 10),
+        fogColor: "#0d0e23",
+        fogNear: 10,
+        fogFar: 2000,
+      },
     };
 
     // General folder
@@ -40,52 +46,101 @@ export class DebugControls {
       expanded: false,
     });
 
+    // Background color control
     generalDebugFolder
-      .addBinding(this.params, "backgorundColor", {
+      .addBinding(this.params.general, "backgroundColor", {
         label: "Background Color",
       })
       .on("change", (ev) => {
         scene.background = new Three.Color(ev.value);
       });
 
-    generalDebugFolder
-      .addBinding(this.params, "cameraMode", {
-        label: "Camera Mode",
-        options: [
-          { text: "First Person", value: "firstPerson" },
-          { text: "Orbit", value: "orbit" },
-        ],
+    // Sky folder
+    const skyDebugFolder = this.pane.addFolder({
+      title: "Sky",
+      expanded: false,
+    });
+
+    skyDebugFolder
+      .addBinding(this.params.sky, "color", {
+        label: "Sky Color",
       })
       .on("change", (ev) => {
-        this.switchControlMode(ev.value as "firstPerson" | "orbit");
+        sky.setMoonLightDetails(
+          new Three.Color(ev.value).getHex(),
+          this.params.sky.intensity
+        );
       });
-  }
 
-  private switchControlMode(mode: "firstPerson" | "orbit"): void {
-    this.currentControlMode = mode;
+    skyDebugFolder
+      .addBinding(this.params.sky, "intensity", {
+        label: "Sky Intensity",
+        min: 0,
+        max: 1,
+        step: 0.01,
+      })
+      .on("change", (ev) => {
+        sky.setMoonLightDetails(
+          new Three.Color(this.params.sky.color).getHex(),
+          ev.value
+        );
+      });
 
-    if (mode === "firstPerson") {
-      // Disable orbit
-      this.orbitControls.setEnabled(false);
+    skyDebugFolder
+      .addBinding(this.params.sky, "position", {
+        label: "Sky Position",
+        x: { min: -100, max: 100, step: 1 },
+        y: { min: -100, max: 100, step: 1 },
+        z: { min: -100, max: 100, step: 1 },
+      })
+      .on("change", (ev) => {
+        sky.setMoonLightDetails(
+          new Three.Color(this.params.sky.color).getHex(),
+          this.params.sky.intensity,
+          this.params.sky.position
+        );
+      });
 
-      // Reset camera for first person
-      this.firstPersonControls.resetCamera();
+    skyDebugFolder
+      .addBinding(this.params.sky, "fogColor", {
+        label: "Fog Color",
+      })
+      .on("change", (ev) => {
+        scene.fog = new Three.Fog(
+          new Three.Color(ev.value).getHex(),
+          this.params.sky.fogNear,
+          this.params.sky.fogFar
+        );
+      });
 
-      // Enable first person
-      this.firstPersonControls.setEnabled(true);
-    } else {
-      // Disable first person
-      this.firstPersonControls.setEnabled(false);
+    skyDebugFolder
+      .addBinding(this.params.sky, "fogNear", {
+        label: "Fog Near",
+        min: 0,
+        max: 1000,
+        step: 1,
+      })
+      .on("change", (ev) => {
+        scene.fog = new Three.Fog(
+          new Three.Color(this.params.sky.fogColor).getHex(),
+          ev.value,
+          this.params.sky.fogFar
+        );
+      });
 
-      // Reset camera for orbit
-      this.orbitControls.resetCamera();
-
-      // Enable orbit
-      this.orbitControls.setEnabled(true);
-    }
-  }
-
-  public getCurrentControlMode(): "firstPerson" | "orbit" {
-    return this.currentControlMode;
+    skyDebugFolder
+      .addBinding(this.params.sky, "fogFar", {
+        label: "Fog Far",
+        min: 100,
+        max: 2000,
+        step: 1,
+      })
+      .on("change", (ev) => {
+        scene.fog = new Three.Fog(
+          new Three.Color(this.params.sky.fogColor).getHex(),
+          this.params.sky.fogNear,
+          ev.value
+        );
+      });
   }
 }

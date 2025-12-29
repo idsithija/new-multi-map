@@ -3,6 +3,7 @@ import { Floor } from "./objects/Floor";
 import { FirstPersonControls } from "./controls/FirstPersonControls";
 import { DebugControls } from "./controls/DebugControls";
 import { OrbitControls } from "./controls/OrbitControls";
+import { Sky } from "./objects/Sky";
 
 export class Game {
   private scene: THREE.Scene;
@@ -11,12 +12,12 @@ export class Game {
   private orbitControls: OrbitControls;
   private firstPersonControls: FirstPersonControls;
   private floor: Floor;
-  private debugControlsPanel: DebugControls;
+  private sky: Sky;
 
   constructor() {
     // Scene setup
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(0x000000); // Black background
+    this.scene.background = new THREE.Color(0x0d0e23); // Black background
 
     // Camera setup
     this.camera = new THREE.PerspectiveCamera(
@@ -35,10 +36,10 @@ export class Game {
     document.body.appendChild(this.renderer.domElement);
 
     // First Person Controls
-    this.firstPersonControls = new FirstPersonControls(
-      this.camera,
-      this.renderer.domElement
-    );
+    // this.firstPersonControls = new FirstPersonControls(
+    //   this.camera,
+    //   this.renderer.domElement
+    // );
 
     // Orbit Controls
     this.orbitControls = new OrbitControls(
@@ -46,16 +47,16 @@ export class Game {
       this.renderer.domElement
     );
 
-    // Debug Controls
-    this.debugControlsPanel = new DebugControls(
-      this.scene,
-      this.orbitControls,
-      this.firstPersonControls
-    );
+    // Create Sky
+    this.sky = new Sky(this.scene);
+    this.sky.addSkyToScene(this.scene);
 
     // Create Floor
     this.floor = new Floor();
     this.floor.addFloorToScene(this.scene);
+
+    // Debug Controls
+    new DebugControls(this.scene, this.sky);
 
     // Handle window resize
     window.addEventListener("resize", this.onWindowResize.bind(this));
