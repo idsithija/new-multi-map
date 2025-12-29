@@ -14,11 +14,11 @@ export class Sky {
     // Set initial position and shadow properties
     this.createMoonLight();
 
-    scene.fog = new Three.Fog(
-      this.fogColor,
-      constants.sky.fogNear,
-      constants.sky.fogFar
-    );
+    // scene.fog = new Three.Fog(
+    //   this.fogColor,
+    //   constants.sky.fogNear,
+    //   constants.sky.fogFar
+    // );
   }
 
   // Helper method to configure moon light properties
