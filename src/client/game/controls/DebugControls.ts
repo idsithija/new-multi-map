@@ -1,6 +1,8 @@
 import { Pane } from "tweakpane";
 import * as Three from "three";
 import { Sky } from "../objects/Sky";
+import { constants } from "../constants/constants";
+import { Floor } from "../objects/Floor";
 
 export class DebugControls {
   private pane: Pane;
@@ -18,7 +20,7 @@ export class DebugControls {
     };
   };
 
-  constructor(scene: Three.Scene, sky: Sky) {
+  constructor(scene: Three.Scene, sky: Sky, floor: Floor) {
     // Initialize tweakpane
     this.pane = new Pane({
       title: "Debug Controls",
@@ -26,19 +28,7 @@ export class DebugControls {
     });
 
     // Parameters for tweakpane
-    this.params = {
-      general: {
-        backgroundColor: "#000000",
-      },
-      sky: {
-        color: "#b3ccff",
-        intensity: 0.12,
-        position: new Three.Vector3(10, 20, 10),
-        fogColor: "#0d0e23",
-        fogNear: 10,
-        fogFar: 2000,
-      },
-    };
+    this.params = constants;
 
     // General folder
     const generalDebugFolder = this.pane.addFolder({
@@ -66,24 +56,22 @@ export class DebugControls {
         label: "Sky Color",
       })
       .on("change", (ev) => {
-        sky.setMoonLightDetails(
-          new Three.Color(ev.value).getHex(),
-          this.params.sky.intensity
-        );
+        sky.setMoonLightProperties({
+          color: new Three.Color(ev.value).getHex(),
+        });
       });
 
     skyDebugFolder
       .addBinding(this.params.sky, "intensity", {
         label: "Sky Intensity",
         min: 0,
-        max: 1,
+        max: 100,
         step: 0.01,
       })
       .on("change", (ev) => {
-        sky.setMoonLightDetails(
-          new Three.Color(this.params.sky.color).getHex(),
-          ev.value
-        );
+        sky.setMoonLightProperties({
+          intensity: ev.value,
+        });
       });
 
     skyDebugFolder
@@ -94,11 +82,13 @@ export class DebugControls {
         z: { min: -100, max: 100, step: 1 },
       })
       .on("change", (ev) => {
-        sky.setMoonLightDetails(
-          new Three.Color(this.params.sky.color).getHex(),
-          this.params.sky.intensity,
-          this.params.sky.position
-        );
+        sky.setMoonLightProperties({
+          position: new Three.Vector3(
+            this.params.sky.position.x,
+            this.params.sky.position.y,
+            this.params.sky.position.z
+          ),
+        });
       });
 
     skyDebugFolder
@@ -131,8 +121,8 @@ export class DebugControls {
     skyDebugFolder
       .addBinding(this.params.sky, "fogFar", {
         label: "Fog Far",
-        min: 100,
-        max: 2000,
+        min: 0,
+        max: 200,
         step: 1,
       })
       .on("change", (ev) => {
@@ -141,6 +131,45 @@ export class DebugControls {
           this.params.sky.fogNear,
           ev.value
         );
+      });
+
+    // Floor folder
+    const floorDebugFolder = this.pane.addFolder({
+      title: "Floor",
+      expanded: false,
+    });
+
+    // Floor color control
+    floorDebugFolder
+      .addBinding(constants.floor, "color", {
+        label: "Floor Color",
+      })
+      .on("change", (ev) => {
+        floor.setFloorProperties({ color: ev.value });
+      });
+
+    // Floor metalness control
+    floorDebugFolder
+      .addBinding(constants.floor, "metalness", {
+        label: "Floor Metalness",
+        min: 0,
+        max: 1,
+        step: 0.01,
+      })
+      .on("change", (ev) => {
+        floor.setFloorProperties({ metalness: ev.value });
+      });
+
+    // Floor roughness control
+    floorDebugFolder
+      .addBinding(constants.floor, "roughness", {
+        label: "Floor Roughness",
+        min: 0,
+        max: 1,
+        step: 0.01,
+      })
+      .on("change", (ev) => {
+        floor.setFloorProperties({ roughness: ev.value });
       });
   }
 }

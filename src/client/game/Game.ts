@@ -4,6 +4,7 @@ import { FirstPersonControls } from "./controls/FirstPersonControls";
 import { DebugControls } from "./controls/DebugControls";
 import { OrbitControls } from "./controls/OrbitControls";
 import { Sky } from "./objects/Sky";
+import { constants } from "./constants/constants";
 
 export class Game {
   private scene: THREE.Scene;
@@ -17,7 +18,7 @@ export class Game {
   constructor() {
     // Scene setup
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(0x0d0e23); // Black background
+    this.scene.background = new THREE.Color(constants.general.backgroundColor); // Black background
 
     // Camera setup
     this.camera = new THREE.PerspectiveCamera(
@@ -56,7 +57,7 @@ export class Game {
     this.floor.addFloorToScene(this.scene);
 
     // Debug Controls
-    new DebugControls(this.scene, this.sky);
+    new DebugControls(this.scene, this.sky, this.floor);
 
     // Handle window resize
     window.addEventListener("resize", this.onWindowResize.bind(this));
