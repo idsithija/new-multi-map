@@ -2,8 +2,7 @@ import { io, Socket } from "socket.io-client";
 import { Game } from "./game/Game";
 
 // Initialize the game
-const game = new Game();
-console.log("Game initialized");
+new Game();
 
 let socket: Socket;
 

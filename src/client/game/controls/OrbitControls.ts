@@ -1,8 +1,11 @@
 import { OrbitControls as ThreeOrbitControls } from "three/examples/jsm/Addons.js";
+import * as THREE from "three";
 
 export class OrbitControls {
   private orbitControls: ThreeOrbitControls;
   private enabled: boolean = false;
+  private defaultPosition = new THREE.Vector3(0, 10, 20);
+  private defaultTarget = new THREE.Vector3(0, 0, 0);
 
   constructor(camera: THREE.PerspectiveCamera, domElement: HTMLElement) {
     // Initialize OrbitControls
@@ -13,32 +16,27 @@ export class OrbitControls {
     this.orbitControls.dampingFactor = 0.05;
     this.orbitControls.screenSpacePanning = false;
     this.orbitControls.maxPolarAngle = Math.PI / 2;
-  }
 
-  public update(): void {
-    if (this.enabled && this.orbitControls.enabled) {
-      this.orbitControls.update();
+    // Disable controls initially
+    if (!this.enabled) {
+      this.orbitControls.enabled = false;
     }
   }
 
+  // Update method to be called in the animation loop
   public setEnabled(enabled: boolean): void {
     this.enabled = enabled;
     this.orbitControls.enabled = enabled;
   }
 
+  // Update method to be called in the animation loop
   public getEnabled(): boolean {
     return this.enabled;
   }
 
-  public setTarget(x: number, y: number, z: number): void {
-    this.orbitControls.target.set(x, y, z);
-  }
-
-  public getControls(): ThreeOrbitControls {
-    return this.orbitControls;
-  }
-
-  public dispose(): void {
-    this.orbitControls.dispose();
+  public resetCamera(camera: THREE.PerspectiveCamera): void {
+    camera.position.copy(this.defaultPosition);
+    this.orbitControls.target.copy(this.defaultTarget);
+    this.orbitControls.update();
   }
 }

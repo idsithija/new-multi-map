@@ -34,14 +34,14 @@ export class Game {
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     document.body.appendChild(this.renderer.domElement);
 
-    // Orbit Controls
-    this.orbitControls = new OrbitControls(
+    // First Person Controls
+    this.firstPersonControls = new FirstPersonControls(
       this.camera,
       this.renderer.domElement
     );
 
-    // First Person Controls
-    this.firstPersonControls = new FirstPersonControls(
+    // Orbit Controls
+    this.orbitControls = new OrbitControls(
       this.camera,
       this.renderer.domElement
     );
@@ -49,6 +49,7 @@ export class Game {
     // Debug Controls
     this.debugControlsPanel = new DebugControls(
       this.scene,
+      this.camera,
       this.orbitControls,
       this.firstPersonControls
     );
@@ -67,15 +68,6 @@ export class Game {
   // Animation loop
   private animate(): void {
     requestAnimationFrame(this.animate.bind(this));
-
-    console.log('Current Control Mode:', this.debugControlsPanel.getCurrentControlMode());
-
-    // Update active controls
-    if (this.debugControlsPanel.getCurrentControlMode() === "firstPerson") {
-      this.firstPersonControls.update();
-    } else {
-      this.orbitControls.update();
-    }
 
     this.renderer.render(this.scene, this.camera);
   }

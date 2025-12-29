@@ -12,15 +12,18 @@ export class DebugControls {
   private currentControlMode: "firstPerson" | "orbit" = "firstPerson";
   private orbitControls: OrbitControls;
   private firstPersonControls: FirstPersonControls;
+  private camera: Three.PerspectiveCamera;
 
   constructor(
     scene: Three.Scene,
+    camera: Three.PerspectiveCamera,
     orbitControls: OrbitControls,
     firstPersonControls: FirstPersonControls
   ) {
     // Store references
     this.orbitControls = orbitControls;
     this.firstPersonControls = firstPersonControls;
+    this.camera = camera;
 
     // Initialize tweakpane
     this.pane = new Pane({
@@ -68,11 +71,17 @@ export class DebugControls {
       // Disable orbit
       this.orbitControls.setEnabled(false);
 
+      // Reset camera for first person
+      this.firstPersonControls.resetCamera(this.camera);
+
       // Enable first person
       this.firstPersonControls.setEnabled(true);
     } else {
       // Disable first person
       this.firstPersonControls.setEnabled(false);
+
+      // Reset camera for orbit
+      this.orbitControls.resetCamera(this.camera);
 
       // Enable orbit
       this.orbitControls.setEnabled(true);
