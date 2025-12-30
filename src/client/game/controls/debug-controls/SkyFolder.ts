@@ -90,7 +90,7 @@ export class SkyFolder {
       .addBinding(this.params.sky, "shadowCameraNear", {
         label: "Shadow Near",
         min: 0.1,
-        max: 10,
+        max: 50,
         step: 0.1,
       })
       .on("change", (ev) => {
@@ -100,9 +100,9 @@ export class SkyFolder {
     skyDebugFolder
       .addBinding(this.params.sky, "shadowCameraFar", {
         label: "Shadow Far",
-        min: 100,
-        max: 1000,
-        step: 10,
+        min: -100,
+        max: 100,
+        step: 0.1,
       })
       .on("change", (ev) => {
         sky.setShadowProperties({ cameraFar: ev.value });

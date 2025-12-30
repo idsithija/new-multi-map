@@ -93,6 +93,7 @@ export class Sky {
       this.moonLight.shadow.camera.updateProjectionMatrix();
     }
     if (cameraFar !== undefined) {
+      console.log("Updating shadow camera far to:", cameraFar);
       this.moonLight.shadow.camera.far = cameraFar;
       this.moonLight.shadow.camera.updateProjectionMatrix();
     }
