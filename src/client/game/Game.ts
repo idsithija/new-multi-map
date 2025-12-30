@@ -47,7 +47,7 @@ export class Game {
     this.floor.addFloorToScene(this.scene);
 
     this.grass = new Grass();
-    this.grass.addGrassToScene(this.scene);
+    // this.grass.addGrassToScene(this.scene);
 
     // Create Player
     this.player = new Player();
@@ -57,11 +57,12 @@ export class Game {
     this.thirdPersonControls = new ThirdPersonControls(
       this.camera,
       this.player.getPlayerMesh(),
-      new THREE.Vector3(0, 5, 10) // Camera offset: 10 units behind, 5 units above
+      constants.camera.offset.clone()
     );
+    this.thirdPersonControls.setSmoothness(constants.camera.smoothness);
 
     // Debug Controls
-    new DebugControls(this.scene, this.sky, this.floor, this.grass);
+    new DebugControls(this.scene, this.sky, this.floor, this.grass, this.thirdPersonControls);
 
     // Handle window resize
     window.addEventListener("resize", this.onWindowResize.bind(this));

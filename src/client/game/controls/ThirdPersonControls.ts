@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { constants } from "../constants/constants";
 
 export class ThirdPersonControls {
   private camera: THREE.PerspectiveCamera;
@@ -7,11 +8,12 @@ export class ThirdPersonControls {
   private currentPosition: THREE.Vector3;
   private currentLookAt: THREE.Vector3;
   private smoothness: number = 0.1; // Lower = smoother (0.05-0.15 recommended)
+  private lookAtOffset: number = constants.camera.lookAtOffset;
 
   constructor(
     camera: THREE.PerspectiveCamera,
     target: THREE.Mesh,
-    offset: THREE.Vector3 = new THREE.Vector3(0, 5, 10)
+    offset: THREE.Vector3 = new THREE.Vector3(0, 1.5, 6)
   ) {
     this.camera = camera;
     this.target = target;
@@ -35,7 +37,7 @@ export class ThirdPersonControls {
 
     // Smoothly interpolate look-at position (slightly above player)
     const idealLookAt = this.target.position.clone();
-    idealLookAt.y += 1; // Look at player's center
+    idealLookAt.y += this.lookAtOffset; // Look at player's center
     this.currentLookAt.lerp(idealLookAt, this.smoothness);
 
     // Update camera
@@ -49,6 +51,10 @@ export class ThirdPersonControls {
 
   public setSmoothness(smoothness: number): void {
     this.smoothness = THREE.MathUtils.clamp(smoothness, 0.01, 1);
+  }
+
+  public setLookAtOffset(offset: number): void {
+    this.lookAtOffset = offset;
   }
 
   public getOffset(): THREE.Vector3 {

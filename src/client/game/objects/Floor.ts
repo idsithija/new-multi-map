@@ -12,12 +12,12 @@ export class Floor {
   }
 
   private createFloor(): Three.Mesh {
-    // Create a plane geometry for the floor
+    // Create a plane geometry for the floor with segments for low poly look
     const floorGeometry = new Three.PlaneGeometry(this.size, this.size);
 
-    // Create a simpple material with a color
+    // Create a simple material with a color
     const floorMaterial = new Three.MeshStandardMaterial({
-      color: 0x8b7355, // Base brown color
+      color: constants.floor.color,
       flatShading: true, // ✅ Makes it look low poly
       roughness: constants.floor.roughness,
       metalness: constants.floor.metalness,

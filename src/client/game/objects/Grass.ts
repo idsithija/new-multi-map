@@ -116,47 +116,67 @@ export class Grass {
 
   private generateGrassBlades(): void {
     const dummy = new THREE.Object3D();
+    const floorSize = 1000; // Match your floor size
+    const cellSize = this.spread; // Use spread as cell size (10 units)
+    const cellsPerSide = Math.floor(floorSize / cellSize); // 100 cells per side
+    const bladesPerCell = Math.ceil(this.count / (cellsPerSide * cellsPerSide)); // Distribute blades evenly
 
-    for (let i = 0; i < this.count; i++) {
-      // Random position within spread area
-      const randomX = (Math.random() - 0.5) * this.spread;
-      const randomZ = (Math.random() - 0.5) * this.spread;
+    let bladeIndex = 0;
 
-      // Random rotation for variety
-      const randomRotation = Math.random() * Math.PI * 2;
+    // Grid-based distribution across entire floor
+    for (let gridX = 0; gridX < cellsPerSide && bladeIndex < this.count; gridX++) {
+      for (let gridZ = 0; gridZ < cellsPerSide && bladeIndex < this.count; gridZ++) {
+        // Calculate cell center position
+        const cellCenterX = (gridX * cellSize) - (floorSize / 2) + (cellSize / 2);
+        const cellCenterZ = (gridZ * cellSize) - (floorSize / 2) + (cellSize / 2);
 
-      // Clustered height variation for natural look
-      const clusterRandom = Math.random();
-      let heightMin, heightMax;
+        // Place multiple blades in this cell
+        for (let b = 0; b < bladesPerCell && bladeIndex < this.count; b++) {
+          // Random offset within the cell
+          const offsetX = (Math.random() - 0.5) * cellSize;
+          const offsetZ = (Math.random() - 0.5) * cellSize;
 
-      if (clusterRandom < 0.3) {
-        // Short grass cluster (30% chance)
-        heightMin = 0.5;
-        heightMax = 0.8;
-      } else if (clusterRandom < 0.7) {
-        // Medium grass cluster (40% chance)
-        heightMin = 0.8;
-        heightMax = 1.2;
-      } else {
-        // Tall grass cluster (30% chance)
-        heightMin = 1.0;
-        heightMax = 1.6;
+          const finalX = cellCenterX + offsetX;
+          const finalZ = cellCenterZ + offsetZ;
+
+          // Random rotation for variety
+          const randomRotation = Math.random() * Math.PI * 2;
+
+          // Clustered height variation for natural look
+          const clusterRandom = Math.random();
+          let heightMin, heightMax;
+
+          if (clusterRandom < 0.3) {
+            // Short grass cluster (30% chance)
+            heightMin = 0.5;
+            heightMax = 0.8;
+          } else if (clusterRandom < 0.7) {
+            // Medium grass cluster (40% chance)
+            heightMin = 0.8;
+            heightMax = 1.2;
+          } else {
+            // Tall grass cluster (30% chance)
+            heightMin = 1.0;
+            heightMax = 1.6;
+          }
+
+          // Non-uniform scaling for different heights
+          const scaleXZ = 0.8 + Math.random() * 0.4; // Width variation (80%-120%)
+          const scaleY = heightMin + Math.random() * (heightMax - heightMin); // Height variation by cluster
+
+          // Set position, rotation, and scale
+          dummy.position.set(finalX, 0, finalZ);
+          dummy.rotation.y = randomRotation;
+          dummy.scale.set(scaleXZ, scaleY, scaleXZ); // Different Y scale for height variation
+
+          // Update matrix
+          dummy.updateMatrix();
+
+          // Apply to instanced mesh
+          this.grass.setMatrixAt(bladeIndex, dummy.matrix);
+          bladeIndex++;
+        }
       }
-
-      // Non-uniform scaling for different heights
-      const scaleXZ = 0.8 + Math.random() * 0.4; // Width variation (80%-120%)
-      const scaleY = heightMin + Math.random() * (heightMax - heightMin); // Height variation by cluster
-
-      // Set position, rotation, and scale
-      dummy.position.set(randomX, 0, randomZ);
-      dummy.rotation.y = randomRotation;
-      dummy.scale.set(scaleXZ, scaleY, scaleXZ); // Different Y scale for height variation
-
-      // Update matrix
-      dummy.updateMatrix();
-
-      // Apply to instanced mesh
-      this.grass.setMatrixAt(i, dummy.matrix);
     }
 
     // Important: tell Three.js to update the instance matrix

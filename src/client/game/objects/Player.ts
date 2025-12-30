@@ -1,8 +1,9 @@
 import * as THREE from "three";
+import { constants } from "../constants/constants";
 
 export class Player {
   private player: THREE.Mesh;
-  private speed: number = 0.1;
+  private speed: number = constants.player.speed;
   private keys = {
     w: false,
     a: false,
@@ -12,10 +13,15 @@ export class Player {
 
   constructor() {
     // Create a simple player representation (e.g., a cylinder)
-    const playerGeometry = new THREE.CylinderGeometry(0.5, 0.5, 2, 8);
+    const playerGeometry = new THREE.CylinderGeometry(
+      constants.player.radius,
+      constants.player.radius,
+      constants.player.height,
+      constants.player.segments
+    );
 
     const playerMaterial = new THREE.MeshStandardMaterial({
-      color: 0x00ff00, // Green color for the player
+      color: constants.player.color,
       flatShading: true,
     });
 

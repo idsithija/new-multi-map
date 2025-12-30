@@ -3,24 +3,30 @@ import { metalness } from "three/examples/jsm/nodes/Nodes.js";
 
 export const constants = {
   general: {
-    backgroundColor: "#d6c9a6",
+    backgroundColor: "#222d6c",
   },
   sky: {
-    color: "#ff9c9c",
-    intensity: 20,
+    color: "#7d85ae",
+    intensity: 11.96,
     position: new Three.Vector3(10, 20, 10),
-    fogNear: 50,
-    fogFar: 500,
-    fogColor: "#d6c9a6"
+    fogNear: -27.2,
+    fogFar: 33.6,
+    fogColor: "#222d6c",
+    shadow: {
+      mapSize: 2048,
+      cameraNear: 0.5,
+      cameraFar: 500,
+      cameraSize: 50,
+    }
   },
   floor: {
-    color: "#b61b1b",
-    metalness: 0.2,
-    roughness: 0.7,
+    color: "#14233b",
+    metalness: 0,
+    roughness: 1,
   },
   grass:{
     color: "#228B22",
-    count: 5000,
+    count: 2000000,
     spread: 10,
     blade: {
       baseWidth: 0.19,
@@ -28,5 +34,17 @@ export const constants = {
       tipWidth: 0.015,
       height: 1.0,
     }
+  },
+  camera: {
+    offset: new Three.Vector3(0, 1.5, 6),
+    smoothness: 0.1,
+    lookAtOffset: 1,
+  },
+  player: {
+    speed: 0.1,
+    color: 0x00ff00,
+    radius: 0.5,
+    height: 2,
+    segments: 8,
   }
 };

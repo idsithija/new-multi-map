@@ -4,6 +4,7 @@ import { Sky } from "../objects/Sky";
 import { constants } from "../constants/constants";
 import { Floor } from "../objects/Floor";
 import { Grass } from "../objects/Grass";
+import { ThirdPersonControls } from "./ThirdPersonControls";
 
 export class DebugControls {
   private pane: Pane;
@@ -18,6 +19,12 @@ export class DebugControls {
       fogNear: number;
       fogFar: number;
       fogColor: string;
+      shadow: {
+        mapSize: number;
+        cameraNear: number;
+        cameraFar: number;
+        cameraSize: number;
+      };
     };
     floor: {
       color: string;
@@ -35,9 +42,13 @@ export class DebugControls {
         height: number;
       };
     };
+    camera: {
+      offset: Three.Vector3;
+      smoothness: number;
+    };
   };
 
-  constructor(scene: Three.Scene, sky: Sky, floor: Floor, grass: Grass) {
+  constructor(scene: Three.Scene, sky: Sky, floor: Floor, grass: Grass, thirdPersonControls: ThirdPersonControls) {
     // Initialize tweakpane
     this.pane = new Pane({
       title: "Debug Controls",
@@ -148,6 +159,56 @@ export class DebugControls {
           this.params.sky.fogNear,
           ev.value
         );
+      });
+
+    // Shadow subfolder
+    const shadowDebugFolder = skyDebugFolder.addFolder({
+      title: "Light Shadows",
+      expanded: false,
+    });
+
+    shadowDebugFolder
+      .addBinding(this.params.sky.shadow, "mapSize", {
+        label: "Shadow Map Size",
+        min: 512,
+        max: 4096,
+        step: 512,
+      })
+      .on("change", (ev) => {
+        sky.setShadowProperties({ mapSize: ev.value });
+      });
+
+    shadowDebugFolder
+      .addBinding(this.params.sky.shadow, "cameraNear", {
+        label: "Shadow Near",
+        min: 0.1,
+        max: 10,
+        step: 0.1,
+      })
+      .on("change", (ev) => {
+        sky.setShadowProperties({ cameraNear: ev.value });
+      });
+
+    shadowDebugFolder
+      .addBinding(this.params.sky.shadow, "cameraFar", {
+        label: "Shadow Far",
+        min: 100,
+        max: 1000,
+        step: 10,
+      })
+      .on("change", (ev) => {
+        sky.setShadowProperties({ cameraFar: ev.value });
+      });
+
+    shadowDebugFolder
+      .addBinding(this.params.sky.shadow, "cameraSize", {
+        label: "Shadow Area Size",
+        min: 10,
+        max: 200,
+        step: 5,
+      })
+      .on("change", (ev) => {
+        sky.setShadowProperties({ cameraSize: ev.value });
       });
 
     // Floor folder
@@ -272,6 +333,40 @@ export class DebugControls {
       })
       .on("change", () => {
         grass.updateGeometry();
+      });
+
+    // Camera folder
+    const cameraDebugFolder = this.pane.addFolder({
+      title: "Third Person Camera",
+      expanded: false,
+    });
+
+    cameraDebugFolder
+      .addBinding(constants.camera, "offset", {
+        label: "Camera Offset",
+        x: { min: -20, max: 20, step: 0.5 },
+        y: { min: 0, max: 30, step: 0.5 },
+        z: { min: -20, max: 20, step: 0.5 },
+      })
+      .on("change", (ev) => {
+        thirdPersonControls.setOffset(
+          new Three.Vector3(
+            constants.camera.offset.x,
+            constants.camera.offset.y,
+            constants.camera.offset.z
+          )
+        );
+      });
+
+    cameraDebugFolder
+      .addBinding(constants.camera, "smoothness", {
+        label: "Camera Smoothness",
+        min: 0.01,
+        max: 0.5,
+        step: 0.01,
+      })
+      .on("change", (ev) => {
+        thirdPersonControls.setSmoothness(ev.value);
       });
   }
 }
