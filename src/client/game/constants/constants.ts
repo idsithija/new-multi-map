@@ -19,8 +19,14 @@ export const constants = {
     roughness: 0.7,
   },
   grass:{
-    color: "#d6c9a6",
+    color: "#228B22",
     count: 5000,
     spread: 10,
+    blade: {
+      baseWidth: 0.19,
+      midWidth: 0.09,
+      tipWidth: 0.015,
+      height: 1.0,
+    }
   }
 };

@@ -28,7 +28,7 @@ export class Grass {
     );
 
     // Set position for each blade
-    // this.generateGrassBlades();
+    this.generateGrassBlades();
 
     // Enable shadows
     this.grass.castShadow = true;
@@ -42,61 +42,67 @@ export class Grass {
   private createBladeGeometry(): THREE.BufferGeometry {
     const geometry = new THREE.BufferGeometry();
 
+    // Get blade parameters from constants
+    const blade = constants.grass.blade;
+    const baseW = blade.baseWidth;
+    const midW = blade.midWidth;
+    const tipW = blade.tipWidth;
+    const h = blade.height;
+
     // Define vertices for a tapered grass blade
     // Blade is wider at bottom, narrow at top, with slight curve
     const vertices = new Float32Array([
       // Bottom section (wide base)
-      -0.05,
+      -baseW,
       0,
       0, // Bottom left
-      0.05,
+      baseW,
       0,
       0, // Bottom right
-      -0.04,
-      0.4,
-      0.05, // Mid-left (slightly curved forward)
+      -midW,
+      h * 0.4,
+      0, // Mid-left (slightly curved forward)
 
-      0.05,
+      baseW,
       0,
       0, // Bottom right
-      0.04,
-      0.4,
-      0.05, // Mid-right
-      -0.04,
-      0.4,
-      0.05, // Mid-left
+      midW,
+      h * 0.4,
+      0, // Mid-right
+      -midW,
+      h * 0.4,
+      0, // Mid-left
 
       // Top section (narrow tip)
-      -0.04,
-      0.4,
-      0.05, // Mid-left
-      0.04,
-      0.4,
-      0.05, // Mid-right
-      -0.015,
-      0.8,
-      0.1, // Upper-left (more curved)
+      -midW,
+      h * 0.4,
+      0, // Mid-left
+      midW,
+      h * 0.4,
+      0, // Mid-right
+      -tipW,
+      h * 0.8,
+      0, // Upper-left (more curved)
 
-      0.04,
-      0.4,
-      0.05, // Mid-right
-      0.015,
-      0.8,
-      0.1, // Upper-right
-      -0.015,
-      0.8,
-      0.1, // Upper-left
-
+      midW,
+      h * 0.4,
+      0, // Mid-right
+      tipW,
+      h * 0.8,
+      0, // Upper-right
+      -tipW,
+      h * 0.8,
+      0, // Upper-left
       // Tip section (pointed)
-      -0.015,
-      0.8,
-      0.1, // Upper-left
-      0.015,
-      0.8,
-      0.1, // Upper-right
+      -tipW,
+      h * 0.8,
+      0, // Upper-left
+      tipW,
+      h * 0.8,
+      0, // Upper-right
       0,
-      1,
-      0.15, // Tip (curved forward)
+      h,
+      0, // Tip (curved forward)
     ]);
 
     // Set the position attribute
@@ -108,35 +114,54 @@ export class Grass {
     return geometry;
   }
 
-  // private generateGrassBlades(): void {
-  //   const dummy = new THREE.Object3D();
+  private generateGrassBlades(): void {
+    const dummy = new THREE.Object3D();
 
-  //   for (let i = 0; i < this.count; i++) {
-  //     // Random position within spread area
-  //     const randomX = (Math.random() - 0.5) * this.spread;
-  //     const randomZ = (Math.random() - 0.5) * this.spread;
+    for (let i = 0; i < this.count; i++) {
+      // Random position within spread area
+      const randomX = (Math.random() - 0.5) * this.spread;
+      const randomZ = (Math.random() - 0.5) * this.spread;
 
-  //     // Random rotation for variety
-  //     const randomRotation = Math.random() * Math.PI * 2;
+      // Random rotation for variety
+      const randomRotation = Math.random() * Math.PI * 2;
 
-  //     // Random scale for variation (80% - 120% of original size)
-  //     const randomScale = 0.8 + Math.random() * 0.4;
+      // Clustered height variation for natural look
+      const clusterRandom = Math.random();
+      let heightMin, heightMax;
 
-  //     // Set position, rotation, and scale
-  //     dummy.position.set(randomX, 0, randomZ);
-  //     dummy.rotation.y = randomRotation;
-  //     dummy.scale.set(randomScale, randomScale, randomScale);
+      if (clusterRandom < 0.3) {
+        // Short grass cluster (30% chance)
+        heightMin = 0.5;
+        heightMax = 0.8;
+      } else if (clusterRandom < 0.7) {
+        // Medium grass cluster (40% chance)
+        heightMin = 0.8;
+        heightMax = 1.2;
+      } else {
+        // Tall grass cluster (30% chance)
+        heightMin = 1.0;
+        heightMax = 1.6;
+      }
 
-  //     // Update matrix
-  //     dummy.updateMatrix();
+      // Non-uniform scaling for different heights
+      const scaleXZ = 0.8 + Math.random() * 0.4; // Width variation (80%-120%)
+      const scaleY = heightMin + Math.random() * (heightMax - heightMin); // Height variation by cluster
 
-  //     // Apply to instanced mesh
-  //     this.grass.setMatrixAt(i, dummy.matrix);
-  //   }
+      // Set position, rotation, and scale
+      dummy.position.set(randomX, 0, randomZ);
+      dummy.rotation.y = randomRotation;
+      dummy.scale.set(scaleXZ, scaleY, scaleXZ); // Different Y scale for height variation
 
-  //   // Important: tell Three.js to update the instance matrix
-  //   this.grass.instanceMatrix.needsUpdate = true;
-  // }
+      // Update matrix
+      dummy.updateMatrix();
+
+      // Apply to instanced mesh
+      this.grass.setMatrixAt(i, dummy.matrix);
+    }
+
+    // Important: tell Three.js to update the instance matrix
+    this.grass.instanceMatrix.needsUpdate = true;
+  }
 
   public getGrassMesh(): THREE.InstancedMesh {
     return this.grass;
@@ -145,6 +170,17 @@ export class Grass {
   public update(deltaTime: number): void {
     // Optional: Add wind animation here later
     // For now, grass is static
+  }
+
+  public updateGeometry(): void {
+    // Recreate the geometry with new blade parameters
+    const newGeometry = this.createBladeGeometry();
+
+    // Dispose old geometry
+    this.grass.geometry.dispose();
+
+    // Apply new geometry
+    this.grass.geometry = newGeometry;
   }
 
   public dispose(): void {
@@ -175,12 +211,12 @@ export class Grass {
 
     if (count !== undefined) {
       this.count = count;
-      // this.generateGrassBlades();
+      this.generateGrassBlades();
     }
 
     if (spread !== undefined) {
       this.spread = spread;
-      // this.generateGrassBlades();
+      this.generateGrassBlades();
     }
 
     if (

@@ -28,6 +28,12 @@ export class DebugControls {
       color: string;
       count: number;
       spread: number;
+      blade: {
+        baseWidth: number;
+        midWidth: number;
+        tipWidth: number;
+        height: number;
+      };
     };
   };
 
@@ -183,37 +189,89 @@ export class DebugControls {
         floor.setFloorProperties({ roughness: ev.value });
       });
 
-      const grassDebugFolder = this.pane.addFolder({
-        title: "Grass",
-        expanded: false,
-      });
+    const grassDebugFolder = this.pane.addFolder({
+      title: "Grass",
+      expanded: false,
+    });
 
-      grassDebugFolder
+    grassDebugFolder
       .addBinding(constants.grass, "color", {
         label: "Grass Color",
       })
       .on("change", (ev) => {
-        grass.setGrassProperties({ 
+        grass.setGrassProperties({
           color: ev.value,
-
         });
       });
 
-      grassDebugFolder
+    grassDebugFolder
       .addBinding(constants.grass, "count", {
-        label: "Grass Count",}).on("change", (ev) => {
-          grass.setGrassProperties({ 
-            count: ev.value,
-          });
+        label: "Grass Count",
+      })
+      .on("change", (ev) => {
+        grass.setGrassProperties({
+          count: ev.value,
+        });
       });
 
-      grassDebugFolder
+    grassDebugFolder
       .addBinding(constants.grass, "spread", {
-        label: "Grass Spread",}).on("change", (ev) => {
-          grass.setGrassProperties({ 
-            spread: ev.value,
-          });
+        label: "Grass Spread",
+      })
+      .on("change", (ev) => {
+        grass.setGrassProperties({
+          spread: ev.value,
+        });
       });
-      
+
+    // Blade Geometry subfolder
+    const bladeDebugFolder = grassDebugFolder.addFolder({
+      title: "Blade Shape",
+      expanded: true,
+    });
+
+    bladeDebugFolder
+      .addBinding(constants.grass.blade, "baseWidth", {
+        label: "Base Width",
+        min: 0.01,
+        max: 0.2,
+        step: 0.005,
+      })
+      .on("change", () => {
+        grass.updateGeometry();
+      });
+
+    bladeDebugFolder
+      .addBinding(constants.grass.blade, "midWidth", {
+        label: "Mid Width",
+        min: 0.01,
+        max: 0.15,
+        step: 0.005,
+      })
+      .on("change", () => {
+        grass.updateGeometry();
+      });
+
+    bladeDebugFolder
+      .addBinding(constants.grass.blade, "tipWidth", {
+        label: "Tip Width",
+        min: 0.005,
+        max: 0.1,
+        step: 0.005,
+      })
+      .on("change", () => {
+        grass.updateGeometry();
+      });
+
+    bladeDebugFolder
+      .addBinding(constants.grass.blade, "height", {
+        label: "Height",
+        min: 0.3,
+        max: 3.0,
+        step: 0.1,
+      })
+      .on("change", () => {
+        grass.updateGeometry();
+      });
   }
 }
