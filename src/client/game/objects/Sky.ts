@@ -3,7 +3,7 @@ import { constants } from "../constants/constants";
 
 export class Sky {
   private moonLight: Three.DirectionalLight;
-  private fogColor: string = constants.sky.fogColor;
+  private fogColor: string = constants.general.fogColor;
 
   constructor(scene: Three.Scene) {
     // Initialize moon light to simulate sky lighting
@@ -16,8 +16,8 @@ export class Sky {
 
     scene.fog = new Three.Fog(
       this.fogColor,
-      constants.sky.fogNear,
-      constants.sky.fogFar
+      constants.general.fogNear,
+      constants.general.fogFar
     );
   }
 
@@ -31,13 +31,13 @@ export class Sky {
     this.moonLight.castShadow = true;
 
     // Shadow settings
-    this.moonLight.shadow.mapSize.width = constants.sky.shadow.mapSize;
-    this.moonLight.shadow.mapSize.height = constants.sky.shadow.mapSize;
-    this.moonLight.shadow.camera.near = constants.sky.shadow.cameraNear;
-    this.moonLight.shadow.camera.far = constants.sky.shadow.cameraFar;
+    this.moonLight.shadow.mapSize.width = constants.sky.mapSize;
+    this.moonLight.shadow.mapSize.height = constants.sky.mapSize;
+    this.moonLight.shadow.camera.near = constants.sky.shadowCameraNear;
+    this.moonLight.shadow.camera.far = constants.sky.shadowCameraFar;
     
     // Shadow camera size (orthographic camera bounds)
-    const size = constants.sky.shadow.cameraSize;
+    const size = constants.sky.shadowCameraSize;
     this.moonLight.shadow.camera.left = -size;
     this.moonLight.shadow.camera.right = size;
     this.moonLight.shadow.camera.top = size;

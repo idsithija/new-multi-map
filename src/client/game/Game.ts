@@ -1,21 +1,25 @@
 import * as THREE from "three";
 import { Floor } from "./objects/Floor";
-import { ThirdPersonControls } from "./controls/ThirdPersonControls";
-import { DebugControls } from "./controls/DebugControls";
+// import { ThirdPersonControls } from "./controls/ThirdPersonControls";
 import { Sky } from "./objects/Sky";
 import { constants } from "./constants/constants";
 import { Player } from "./objects/Player";
 import { Grass } from "./objects/Grass";
+import { OrbitControls } from "./controls/OrbitControls";
+import { BoxRock } from "./objects/BoxRock";
+import { DebugControls } from "./controls/debug-controls";
 
 export class Game {
   private scene: THREE.Scene;
   private camera: THREE.PerspectiveCamera;
   private renderer: THREE.WebGLRenderer;
-  private thirdPersonControls: ThirdPersonControls;
+  // private thirdPersonControls: ThirdPersonControls;
+  private orbitControls: OrbitControls;
   private floor: Floor;
   private sky: Sky;
   private player: Player;
   private grass: Grass;
+  private boxRock: BoxRock;
 
   constructor() {
     // Scene setup
@@ -46,6 +50,11 @@ export class Game {
     this.floor = new Floor();
     this.floor.addFloorToScene(this.scene);
 
+    // Create Box
+    this.boxRock = new BoxRock();
+    this.boxRock.addBoxRockToScene(this.scene);
+
+    // Create Grass
     this.grass = new Grass();
     // this.grass.addGrassToScene(this.scene);
 
@@ -54,15 +63,21 @@ export class Game {
     this.player.addPlayerToScene(this.scene);
 
     // Third Person Camera Controls (follows player)
-    this.thirdPersonControls = new ThirdPersonControls(
+    // this.thirdPersonControls = new ThirdPersonControls(
+    //   this.camera,
+    //   this.player.getPlayerMesh(),
+    //   constants.camera.offset.clone()
+    // );
+    // this.thirdPersonControls.setSmoothness(constants.camera.smoothness);
+
+    // Orbit Controls (for debugging)
+    this.orbitControls = new OrbitControls(
       this.camera,
-      this.player.getPlayerMesh(),
-      constants.camera.offset.clone()
+      this.renderer.domElement
     );
-    this.thirdPersonControls.setSmoothness(constants.camera.smoothness);
 
     // Debug Controls
-    new DebugControls(this.scene, this.sky, this.floor, this.grass, this.thirdPersonControls);
+    new DebugControls({ scene: this.scene, sky: this.sky, floor: this.floor, grass: this.grass });
 
     // Handle window resize
     window.addEventListener("resize", this.onWindowResize.bind(this));
@@ -79,7 +94,7 @@ export class Game {
     this.player.update();
 
     // Update camera to follow player
-    this.thirdPersonControls.update();
+    // this.thirdPersonControls.update();
 
     this.renderer.render(this.scene, this.camera);
   }

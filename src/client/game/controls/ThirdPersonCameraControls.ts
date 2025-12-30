@@ -1,14 +1,14 @@
 import * as THREE from "three";
 import { constants } from "../constants/constants";
 
-export class ThirdPersonControls {
+export class ThirdPersonCameraControls {
   private camera: THREE.PerspectiveCamera;
   private target: THREE.Mesh;
   private offset: THREE.Vector3;
   private currentPosition: THREE.Vector3;
   private currentLookAt: THREE.Vector3;
   private smoothness: number = 0.1; // Lower = smoother (0.05-0.15 recommended)
-  private lookAtOffset: number = constants.camera.lookAtOffset;
+  private lookAtOffset: number = constants.thirdPerson.lookAtOffset;
 
   constructor(
     camera: THREE.PerspectiveCamera,
