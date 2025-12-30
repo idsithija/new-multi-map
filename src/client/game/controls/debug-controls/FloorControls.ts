@@ -1,8 +1,9 @@
+import { Pane } from "tweakpane";
 import { constants } from "../../constants/constants";
 import { Floor } from "../../objects/Floor";
-import { BaseControls } from "./BaseControls";
 
 export interface IFloorParams {
+  pane: Pane;
   floor: Floor;
 }
 
@@ -14,22 +15,23 @@ interface IFloorValues {
   };
 }
 
-export class FloorControls extends BaseControls<IFloorValues> {
-  constructor({ floor }: IFloorParams) {
-    super({
+export class FloorControls {
+  private params: IFloorValues;
+  constructor({ pane, floor }: IFloorParams) {
+    this.params = {
       floor: {
         ...constants.floor,
       },
-    });
+    };
 
-     const floorDebugFolder = this.pane.addFolder({
+    const floorDebugFolder = pane.addFolder({
       title: "Floor",
       expanded: false,
     });
 
     // Floor color control
     floorDebugFolder
-      .addBinding(constants.floor, "color", {
+      .addBinding(this.params.floor, "color", {
         label: "Floor Color",
       })
       .on("change", (ev) => {
@@ -38,7 +40,7 @@ export class FloorControls extends BaseControls<IFloorValues> {
 
     // Floor metalness control
     floorDebugFolder
-      .addBinding(constants.floor, "metalness", {
+      .addBinding(this.params.floor, "metalness", {
         label: "Floor Metalness",
         min: 0,
         max: 1,
@@ -50,7 +52,7 @@ export class FloorControls extends BaseControls<IFloorValues> {
 
     // Floor roughness control
     floorDebugFolder
-      .addBinding(constants.floor, "roughness", {
+      .addBinding(this.params.floor, "roughness", {
         label: "Floor Roughness",
         min: 0,
         max: 1,

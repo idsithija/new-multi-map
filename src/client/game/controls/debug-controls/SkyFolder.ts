@@ -1,7 +1,7 @@
 import * as THREE from "three";
-import { BaseControls } from "./BaseControls";
 import { constants } from "../../constants/constants";
 import { Sky } from "../../objects/Sky";
+import { Pane } from "tweakpane";
 
 export interface ISkyValues {
   sky: {
@@ -16,18 +16,21 @@ export interface ISkyValues {
 }
 
 export interface ISkyParams {
+  pane: Pane;
   sky: Sky;
 }
 
-export class SkyFolder extends BaseControls<ISkyValues> {
-  constructor({ sky }: ISkyParams) {
-    super({
+export class SkyFolder {
+  private params: ISkyValues;
+
+  constructor({ pane, sky }: ISkyParams) {
+    this.params = {
       sky: {
         ...constants.sky,
       },
-    });
+    };
 
-    const skyDebugFolder = this.pane.addFolder({
+    const skyDebugFolder = pane.addFolder({
       title: "Sky",
       expanded: false,
     });

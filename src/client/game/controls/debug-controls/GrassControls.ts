@@ -1,6 +1,6 @@
+import { Pane } from "tweakpane";
 import { constants } from "../../constants/constants";
 import { Grass } from "../../objects/Grass";
-import { BaseControls } from "./BaseControls";
 
 interface IGrassValues {
   grass: {
@@ -17,24 +17,27 @@ interface IGrassValues {
 }
 
 export interface IGrassParams {
+  pane: Pane;
   grass: Grass;
 }
 
-export class GrassControls extends BaseControls<IGrassValues> {
-  constructor({ grass }: IGrassParams) {
-    super({
+export class GrassControls {
+  private params: IGrassValues;
+
+  constructor({ pane, grass }: IGrassParams) {
+    this.params = {
       grass: {
         ...constants.grass,
       },
-    });
+    };
 
-    const grassDebugFolder = this.pane.addFolder({
+    const grassDebugFolder = pane.addFolder({
       title: "Grass",
       expanded: false,
     });
 
     grassDebugFolder
-      .addBinding(constants.grass, "color", {
+      .addBinding(this.params.grass, "color", {
         label: "Grass Color",
       })
       .on("change", (ev) => {
@@ -44,7 +47,7 @@ export class GrassControls extends BaseControls<IGrassValues> {
       });
 
     grassDebugFolder
-      .addBinding(constants.grass, "count", {
+      .addBinding(this.params.grass, "count", {
         label: "Grass Count",
       })
       .on("change", (ev) => {
@@ -54,7 +57,7 @@ export class GrassControls extends BaseControls<IGrassValues> {
       });
 
     grassDebugFolder
-      .addBinding(constants.grass, "spread", {
+      .addBinding(this.params.grass, "spread", {
         label: "Grass Spread",
       })
       .on("change", (ev) => {
@@ -63,13 +66,8 @@ export class GrassControls extends BaseControls<IGrassValues> {
         });
       });
 
-    const bladeDebugFolder = grassDebugFolder.addFolder({
-      title: "Blade Shape",
-      expanded: true,
-    });
-
-    bladeDebugFolder
-      .addBinding(constants.grass.blade, "baseWidth", {
+    grassDebugFolder
+      .addBinding(this.params.grass.blade, "baseWidth", {
         label: "Base Width",
         min: 0.01,
         max: 0.2,
@@ -79,8 +77,8 @@ export class GrassControls extends BaseControls<IGrassValues> {
         grass.updateGeometry();
       });
 
-    bladeDebugFolder
-      .addBinding(constants.grass.blade, "midWidth", {
+    grassDebugFolder
+      .addBinding(this.params.grass.blade, "midWidth", {
         label: "Mid Width",
         min: 0.01,
         max: 0.15,
@@ -90,8 +88,8 @@ export class GrassControls extends BaseControls<IGrassValues> {
         grass.updateGeometry();
       });
 
-    bladeDebugFolder
-      .addBinding(constants.grass.blade, "tipWidth", {
+    grassDebugFolder
+      .addBinding(this.params.grass.blade, "tipWidth", {
         label: "Tip Width",
         min: 0.005,
         max: 0.1,
@@ -101,8 +99,8 @@ export class GrassControls extends BaseControls<IGrassValues> {
         grass.updateGeometry();
       });
 
-    bladeDebugFolder
-      .addBinding(constants.grass.blade, "height", {
+    grassDebugFolder
+      .addBinding(this.params.grass.blade, "height", {
         label: "Height",
         min: 0.3,
         max: 3.0,

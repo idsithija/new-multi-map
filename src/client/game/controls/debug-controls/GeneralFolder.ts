@@ -1,8 +1,9 @@
 import * as THREE from "three";
-import { BaseControls } from "./BaseControls";
 import { constants } from "../../constants/constants";
+import { Pane } from "tweakpane";
 
 export interface IGeneralParams {
+  pane: Pane;
   scene: THREE.Scene;
 }
 
@@ -15,15 +16,17 @@ export interface IGeneralValues {
   };
 }
 
-export class GeneralFolder extends BaseControls<IGeneralValues> {
-  constructor({ scene }: IGeneralParams) {
-    super({
+export class GeneralFolder {
+  private params: IGeneralValues;
+  
+  constructor({ pane, scene }: IGeneralParams) {
+    this.params = {
       general: {
         ...constants.general,
       },
-    });
+    };
 
-    const generalDebugFolder = this.pane.addFolder({
+    const generalDebugFolder = pane.addFolder({
       title: "General",
       expanded: false,
     });
