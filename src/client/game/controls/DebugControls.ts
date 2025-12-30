@@ -3,6 +3,7 @@ import * as Three from "three";
 import { Sky } from "../objects/Sky";
 import { constants } from "../constants/constants";
 import { Floor } from "../objects/Floor";
+import { Grass } from "../objects/Grass";
 
 export class DebugControls {
   private pane: Pane;
@@ -18,9 +19,19 @@ export class DebugControls {
       fogFar: number;
       fogColor: string;
     };
+    floor: {
+      color: string;
+      metalness: number;
+      roughness: number;
+    };
+    grass: {
+      color: string;
+      count: number;
+      spread: number;
+    };
   };
 
-  constructor(scene: Three.Scene, sky: Sky, floor: Floor) {
+  constructor(scene: Three.Scene, sky: Sky, floor: Floor, grass: Grass) {
     // Initialize tweakpane
     this.pane = new Pane({
       title: "Debug Controls",
@@ -171,5 +182,38 @@ export class DebugControls {
       .on("change", (ev) => {
         floor.setFloorProperties({ roughness: ev.value });
       });
+
+      const grassDebugFolder = this.pane.addFolder({
+        title: "Grass",
+        expanded: false,
+      });
+
+      grassDebugFolder
+      .addBinding(constants.grass, "color", {
+        label: "Grass Color",
+      })
+      .on("change", (ev) => {
+        grass.setGrassProperties({ 
+          color: ev.value,
+
+        });
+      });
+
+      grassDebugFolder
+      .addBinding(constants.grass, "count", {
+        label: "Grass Count",}).on("change", (ev) => {
+          grass.setGrassProperties({ 
+            count: ev.value,
+          });
+      });
+
+      grassDebugFolder
+      .addBinding(constants.grass, "spread", {
+        label: "Grass Spread",}).on("change", (ev) => {
+          grass.setGrassProperties({ 
+            spread: ev.value,
+          });
+      });
+      
   }
 }

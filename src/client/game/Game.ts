@@ -5,6 +5,7 @@ import { DebugControls } from "./controls/DebugControls";
 import { Sky } from "./objects/Sky";
 import { constants } from "./constants/constants";
 import { Player } from "./objects/Player";
+import { Grass } from "./objects/Grass";
 
 export class Game {
   private scene: THREE.Scene;
@@ -14,6 +15,7 @@ export class Game {
   private floor: Floor;
   private sky: Sky;
   private player: Player;
+  private grass: Grass;
 
   constructor() {
     // Scene setup
@@ -44,6 +46,9 @@ export class Game {
     this.floor = new Floor();
     this.floor.addFloorToScene(this.scene);
 
+    this.grass = new Grass();
+    this.grass.addGrassToScene(this.scene);
+
     // Create Player
     this.player = new Player();
     this.player.addPlayerToScene(this.scene);
@@ -56,7 +61,7 @@ export class Game {
     );
 
     // Debug Controls
-    new DebugControls(this.scene, this.sky, this.floor);
+    new DebugControls(this.scene, this.sky, this.floor, this.grass);
 
     // Handle window resize
     window.addEventListener("resize", this.onWindowResize.bind(this));

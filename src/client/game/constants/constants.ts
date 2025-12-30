@@ -17,5 +17,10 @@ export const constants = {
     color: "#b61b1b",
     metalness: 0.2,
     roughness: 0.7,
+  },
+  grass:{
+    color: "#d6c9a6",
+    count: 5000,
+    spread: 10,
   }
 };
